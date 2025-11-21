@@ -1,93 +1,72 @@
-import { useState } from "react";
-import "./App.css";
-import AuthenticatedView from "./AuthenticatedView";
+import Keycloak from "keycloak-js";
 import { BASE_URL } from "./utils";
+import { useState } from "react";
 
-function App() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const kc = new Keycloak({
+  url: "http://myapp.local:8080",
+  realm: "dev_deployment",
+  clientId: "frontend-app",
+});
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+kc.init({
+  onLoad: "login-required",
+  checkLoginIframe: true,
+  pkceMethod: "S256",
+}).then(
+  (auth) => {
+    if (!auth) {
+      window.location.reload();
+    } else {
+      /* Remove below logs if you are using this on production */
+      console.info("Authenticated");
+      console.log("auth", auth);
+      console.log("Keycloak", kc);
+      console.log("Access Token", kc.token);
 
-    const res = await fetch(`${BASE_URL}/api/login/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (!res.ok) {
-      alert("Login failed. Please check your credentials.");
-      throw new Error("Login failed");
+      kc.onTokenExpired = () => {
+        console.log("token expired");
+      };
     }
+  },
+  () => {
+    /* Notify the user if necessary */
+    console.error("Authentication Failed");
+  }
+);
 
-    localStorage.setItem("access_token", (await res.json()).access_token);
-    setIsAuthenticated(true);
+const App = () => {
+  const [sampleTestResponse, setSampleTestResponse] = useState<string>("");
+
+  const handleTestRequest = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/test/`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${kc.token}`,
+        },
+      });
+
+      if (!res.ok) {
+        console.log("Failed to fetch.");
+        throw new Error("Failed to fetch!");
+      }
+
+      const data = await res.json();
+      setSampleTestResponse(data);
+    } catch (error) {
+      console.error("Error during test request:", error);
+    }
   };
 
   return (
-    <div className="login-container">
-      {isAuthenticated ? (
-        <AuthenticatedView />
-      ) : (
-        <div className="login-box" role="region" aria-label="Login form">
-          <h2>Welcome back</h2>
-          <p className="subtitle">Sign in to continue to your account</p>
+    <div>
+      <h1>Welcome</h1>
 
-          <form onSubmit={handleLogin}>
-            <div className="input-group">
-              <label htmlFor="username">Username</label>
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="you@example.com"
-                autoComplete="username"
-                required
-              />
-            </div>
+      <button onClick={handleTestRequest}>Test Request to DRF API</button>
 
-            <div className="input-group">
-              <label htmlFor="password">Password</label>
-              <div className="password-field">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="toggle-password"
-                  onClick={() => setShowPassword((s) => !s)}
-                  aria-pressed={showPassword}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="login-button"
-              disabled={!username.trim() || !password}
-            >
-              Sign in
-            </button>
-          </form>
-        </div>
-      )}
+      {sampleTestResponse && <p>{JSON.stringify(sampleTestResponse)}</p>}
     </div>
   );
-}
+};
 
 export default App;
