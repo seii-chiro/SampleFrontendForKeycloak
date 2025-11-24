@@ -1,6 +1,7 @@
 import Keycloak from "keycloak-js";
 import { BASE_URL } from "./utils";
 import { useState } from "react";
+import "./App.css";
 
 const kc = new Keycloak({
   url: "http://myapp.local:8080",
@@ -34,8 +35,17 @@ kc.init({
   }
 );
 
+export interface TestRequest {
+  user: string;
+  roles: string[];
+  first_name: string;
+  family_name: string;
+  email: string;
+}
+
 const App = () => {
-  const [sampleTestResponse, setSampleTestResponse] = useState<string>("");
+  const [sampleTestResponse, setSampleTestResponse] =
+    useState<TestRequest | null>(null);
 
   const handleTestRequest = async () => {
     try {
@@ -45,6 +55,10 @@ const App = () => {
           Authorization: `Bearer ${kc.token}`,
         },
       });
+
+      if (res.status === 403) {
+        window.location.reload();
+      }
 
       if (!res.ok) {
         console.log("Failed to fetch.");
@@ -59,12 +73,38 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>Welcome</h1>
+    <div className="home-container">
+      <div className="home-content">
+        <h1>Welcome</h1>
+        <p className="subtitle">You're successfully authenticated</p>
 
-      <button onClick={handleTestRequest}>Test Request to DRF API</button>
+        <div className="info-card">
+          <div className="info-item">
+            <span className="label">Status</span>
+            <span className="value status-connected">Connected</span>
+          </div>
+          <div className="info-item">
+            <span className="label">Realm</span>
+            <span className="value">dev_deployment</span>
+          </div>
+        </div>
 
-      {sampleTestResponse && <p>{JSON.stringify(sampleTestResponse)}</p>}
+        <div className="api-test-section">
+          <h2>API Test</h2>
+          <button className="test-button" onClick={handleTestRequest}>
+            Test Request to DRF API
+          </button>
+          {sampleTestResponse && (
+            <pre className="response-box">
+              {JSON.stringify(sampleTestResponse, null, 2)}
+            </pre>
+          )}
+        </div>
+
+        <button className="logout-button" onClick={() => kc.logout()}>
+          Sign Out
+        </button>
+      </div>
     </div>
   );
 };
