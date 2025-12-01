@@ -2,8 +2,8 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router"
 import "./App.css";
 import RootLayout from "./layout/RootLayout";
 import ProtectedRoute from "./layout/ProtectedRoute";
-import UserHome from "./pages/UserHome";
-import AdminHome from "./pages/AdminHome";
+import UserHome from "./pages/user/UserHome";
+import AdminHome from "./pages/admin/AdminHome";
 import { useKeycloak } from "./hooks/useKeycloak";
 import AdminLayout from "./layout/AdminLayout";
 import UserLayout from "./layout/UserLayout";
