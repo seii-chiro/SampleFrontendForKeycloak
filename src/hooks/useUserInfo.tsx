@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import type { TestRequest } from "../App";
 import { BASE_URL } from "../utils";
 import { useKeycloak } from "./useKeycloak";
+import type { MeType } from "../global-definitions";
 
 const useUserInfo = () => {
     const { keycloak } = useKeycloak();
     const [isLoading, setIsLoading] = useState(true);
-    const [userInfo, setUserInfo] = useState<TestRequest | null>(null);
+    const [userInfo, setUserInfo] = useState<MeType | null>(null);
 
     useEffect(() => {
         if (!keycloak?.token) return;
@@ -14,7 +14,7 @@ const useUserInfo = () => {
         const getUserInfo = async () => {
             try {
                 setIsLoading(true);
-                const res = await fetch(`${BASE_URL}/api/test/`, {
+                const res = await fetch(`${BASE_URL}/api/me/`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${keycloak.token}`,
@@ -32,7 +32,7 @@ const useUserInfo = () => {
                 }
 
                 const data = await res.json();
-                setUserInfo(data);
+                setUserInfo(data?.[0] ?? null);
             } catch (error) {
                 console.error("Error during test request:", error);
             } finally {
