@@ -19,7 +19,7 @@ const LogoutButton = ({ keycloak }: LogoutButtonProps) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="destructive" className='w-28 absolute right-4 top-4'>
+                <Button className="p-0 bg-transparent text-black hover:bg-transparent w-full justify-start cursor-pointer">
                     Logout
                 </Button>
             </DialogTrigger>
