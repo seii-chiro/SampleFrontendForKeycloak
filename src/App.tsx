@@ -7,14 +7,8 @@ import AdminHome from "./pages/admin/AdminHome";
 import { useKeycloak } from "./hooks/useKeycloak";
 import AdminLayout from "./layout/AdminLayout";
 import UserLayout from "./layout/UserLayout";
+import PatientRegistrationForm from "./pages/user/patient/PatientRegistrationForm";
 
-export interface TestRequest {
-  user: string;
-  roles: string[];
-  first_name: string;
-  family_name: string;
-  email: string;
-}
 
 const App = () => {
   const { authenticated, loading } = useKeycloak();
@@ -38,6 +32,10 @@ const App = () => {
                 {
                   index: true,
                   element: <UserHome />,
+                },
+                {
+                  path: "patient-registration",
+                  element: <PatientRegistrationForm />,
                 }
               ]
             },
