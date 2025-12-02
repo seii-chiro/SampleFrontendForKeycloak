@@ -1,50 +1,50 @@
 import { useState } from "react"
+import SelectionCard from "./SelectionCard"
+import { useNavigate } from "react-router"
 
 const PatientOrDentistCreationPage = () => {
     const [selectedRole, setSelectedRole] = useState<'patient' | 'dentist' | null>(null)
+    const navigate = useNavigate();
 
     const handleSelection = (role: 'patient' | 'dentist') => {
         setSelectedRole(role)
-        // TODO: Navigate to appropriate registration form or handle selection
-        console.log('Selected role:', role)
     }
 
     return (
-        <div className="home-container">
-            <div className="home-content" style={{ maxWidth: '500px' }}>
-                <h1>Welcome</h1>
-                <p className="subtitle">Are you registering as a patient or a dentist?</p>
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-6">
+            <div className="w-full max-w-2xl">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-slate-900 mb-3">Welcome</h1>
+                    <p className="text-lg text-slate-700">Choose how you'd like to register</p>
+                </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-                    <button
-                        onClick={() => handleSelection('patient')}
-                        className={selectedRole === 'patient' ? 'test-button' : 'logout-button'}
-                        style={{ padding: '20px', textAlign: 'left' }}
-                    >
-                        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🦷</div>
-                        <div style={{ fontWeight: '600', fontSize: '18px', marginBottom: '4px' }}>Patient</div>
-                        <div style={{ fontSize: '14px', opacity: 0.7 }}>Book appointments and manage your dental health</div>
-                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <SelectionCard
+                        selectedRole={selectedRole === 'patient' ? 'patient' : ''}
+                        handleSelection={handleSelection}
+                        title="patient"
+                        description="Book appointments and manage your dental health"
+                        imageIcon="🦷"
+                    />
 
-                    <button
-                        onClick={() => handleSelection('dentist')}
-                        className={selectedRole === 'dentist' ? 'test-button' : 'logout-button'}
-                        style={{ padding: '20px', textAlign: 'left' }}
-                    >
-                        <div style={{ fontSize: '32px', marginBottom: '8px' }}>👨‍⚕️</div>
-                        <div style={{ fontWeight: '600', fontSize: '18px', marginBottom: '4px' }}>Dentist</div>
-                        <div style={{ fontSize: '14px', opacity: 0.7 }}>Manage your practice and appointments</div>
-                    </button>
+                    <SelectionCard
+                        selectedRole={selectedRole === 'dentist' ? 'dentist' : ''}
+                        handleSelection={handleSelection}
+                        title="dentist"
+                        description="Manage your practice and patient appointments"
+                        imageIcon="👨‍⚕️"
+                    />
                 </div>
 
                 {selectedRole && (
-                    <button
-                        onClick={() => console.log('Proceeding with:', selectedRole)}
-                        className="test-button"
-                        style={{ width: '100%' }}
-                    >
-                        Continue
-                    </button>
+                    <div className="mt-12 text-center">
+                        <button
+                            onClick={() => navigate(selectedRole === 'patient' ? '/home/patient-registration' : '/home/dentist-registration')}
+                            className="px-12 py-4 rounded-xl bg-linear-to-r from-slate-800 to-slate-900 text-white font-bold text-lg hover:shadow-lg transition-all hover:scale-105"
+                        >
+                            Continue as {selectedRole === 'patient' ? 'Patient' : 'Dentist'}
+                        </button>
+                    </div>
                 )}
             </div>
         </div>
