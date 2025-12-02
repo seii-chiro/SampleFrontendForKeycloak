@@ -1,23 +1,16 @@
-import { useKeycloak } from '../../hooks/useKeycloak';
 import useUserInfo from '../../hooks/useUserInfo';
 import PatientOrDentistCreationPage from '../common-components/PatientOrDentistSelectionPage';
+import DentistProfile from './dentist/DentistProfile';
+import PatientProfile from './patient/PatientProfile';
 
 const UserHome = () => {
-    const { keycloak } = useKeycloak();
     const { userInfo } = useUserInfo();
 
-    const handleLogout = () => {
-        keycloak?.logout();
-    }
-
     return (
-        !userInfo?.patient_profile || !userInfo?.dentist_profile ? (
+        userInfo?.patient_profile === null && userInfo?.dentist_profile === null ? (
             <PatientOrDentistCreationPage />
         ) : (
-            <>
-                <div>Admin Home</div>
-                <button onClick={handleLogout}>Logout</button>
-            </>
+            userInfo?.patient_profile !== null ? <PatientProfile /> : <DentistProfile />
         )
     )
 }
