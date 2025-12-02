@@ -58,3 +58,9 @@ export interface Me extends User {
 }
 
 export type MeType = Me & AuditTrails;
+
+export interface Gender extends AuditTrails {
+  id: string;
+  gender: string;
+  description: string;
+}
